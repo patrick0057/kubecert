@@ -113,4 +113,4 @@ if [[ -f "$FILE" ]]; then
     mv ${FILE} ${KUBEBACKUP}
 fi
 echo "${red}Copying generated kube config in place${reset}"
-cp -afv ${TMPDIR}/kubeconfig #!/bin/bash
+cp -afv ${TMPDIR}/kubeconfig
