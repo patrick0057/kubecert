@@ -104,7 +104,9 @@ setusupthekubeconfig
 mkdir -p ~/.kube/
 KUBEBACKUP="~/.kube/config-$(date +%Y-%m-%d--%H%M%S)"
 FILE="~/.kube/config"
+#expand full path
 eval FILE=$FILE
+eval KUBEBACKUP=$KUBEBACKUP
 if [[ -f "$FILE" ]]; then
     "${red}Backing up ~/.kube/config to ${KUBEBACKUP}${reset}"
     mv ~/.kube/config ${KUBEBACKUP}
