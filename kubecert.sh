@@ -109,7 +109,7 @@ eval FILE=$FILE
 eval KUBEBACKUP=$KUBEBACKUP
 
 if [[ -f "$FILE" ]]; then
-    "${red}Backing up ~/.kube/config to ${KUBEBACKUP}${reset}"
+    echo "${red}Backing up ~/.kube/config to ${KUBEBACKUP}${reset}"
     mv ${FILE} ${KUBEBACKUP}
 fi
 echo "${red}Copying generated kube config in place${reset}"
