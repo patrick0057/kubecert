@@ -109,8 +109,17 @@ eval FILE=$FILE
 eval KUBEBACKUP=$KUBEBACKUP
 
 if [[ -f "$FILE" ]]; then
-    echo "${red}Backing up ~/.kube/config to ${KUBEBACKUP}${reset}"
+    echo "${red}Backing up ${FILE} to ${KUBEBACKUP}${reset}"
     mv ${FILE} ${KUBEBACKUP}
 fi
+echo
+
 echo "${red}Copying generated kube config in place${reset}"
 cp -afv ${TMPDIR}/kubeconfig ${FILE}
+echo
+
+echo "${green}Demonstrating kubectl works...${reset}"
+echo
+kubectl get node
+echo
+echo "${green}Script has completed, working directory where temp files have been stored: ${TMPDIR}${reset}"
