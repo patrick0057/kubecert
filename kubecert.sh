@@ -120,4 +120,4 @@ cp -afv ${TMPDIR}/kubeconfig ${FILE}
 echo "${green}Demonstrating kubectl works...${reset}"
 kubectl get node
 echo
-echo "${green}Script has completed, working directory where temp files have been stored: ${TMPDIR}${reset}"
+echo "${green}Script has completed, kubectl should now be working for the local cluster on this node.${reset}"
