@@ -81,15 +81,15 @@ if [ "$?" != "0" ]; then
     exit 1
 fi
 function setusupthekubeconfig() {
-    kubectl --kubeconfig ${SSLDIRPREFIX}/ssl/kubecfg-kube-node.yaml get configmap -n kube-system full-cluster-state -o json &>/dev/null
+    kubectl --insecure-skip-tls-verify --kubeconfig ${SSLDIRPREFIX}/ssl/kubecfg-kube-node.yaml get configmap -n kube-system full-cluster-state -o json &>/dev/null
     if [ "$?" == "0" ]; then
         echo "${green}Deployed with RKE 0.2.x and newer, grabbing kubeconfig${reset}"
-        kubectl --kubeconfig ${SSLDIRPREFIX}/ssl/kubecfg-kube-node.yaml get configmap -n kube-system full-cluster-state -o json | jq -r .data.\"full-cluster-state\" | jq -r .currentState.certificatesBundle.\"kube-admin\".config | sed -e "/^[[:space:]]*server:/ s_:.*_: \"https://127.0.0.1:6443\"_" >${TMPDIR}/kubeconfig
+        kubect --insecure-skip-tls-verifyl --kubeconfig ${SSLDIRPREFIX}/ssl/kubecfg-kube-node.yaml get configmap -n kube-system full-cluster-state -o json | jq -r .data.\"full-cluster-state\" | jq -r .currentState.certificatesBundle.\"kube-admin\".config | sed -e "/^[[:space:]]*server:/ s_:.*_: \"https://127.0.0.1:6443\"_" >${TMPDIR}/kubeconfig
     fi
-    kubectl --kubeconfig ${SSLDIRPREFIX}/ssl/kubecfg-kube-node.yaml get secret -n kube-system kube-admin -o jsonpath={.data.Config} &>/dev/null
+    kubectl --insecure-skip-tls-verify --kubeconfig ${SSLDIRPREFIX}/ssl/kubecfg-kube-node.yaml get secret -n kube-system kube-admin -o jsonpath={.data.Config} &>/dev/null
     if [ "$?" == "0" ]; then
         echo "${green}Deployed with RKE 0.1.x and older, grabbing kubeconfig${reset}"
-        kubectl --kubeconfig ${SSLDIRPREFIX}/ssl/kubecfg-kube-node.yaml get secret -n kube-system kube-admin -o jsonpath={.data.Config} | base64 -d | sed 's/[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}/127.0.0.1/g' >${TMPDIR}/kubeconfig
+        kubectl --insecure-skip-tls-verify --kubeconfig ${SSLDIRPREFIX}/ssl/kubecfg-kube-node.yaml get secret -n kube-system kube-admin -o jsonpath={.data.Config} | base64 -d | sed 's/[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}/127.0.0.1/g' >${TMPDIR}/kubeconfig
     fi
     if [ ! -f ${TMPDIR}/kubeconfig ]; then
         echo "${red}${TMPDIR}/kubeconfig does not exist, script aborting due to kubeconfig generation failure.${reset} "
