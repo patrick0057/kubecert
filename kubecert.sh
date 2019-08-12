@@ -102,6 +102,21 @@ if ! hash wget 2>/dev/null && [[ "${DOWNLOADCMD}" == "wget" ]]; then
     grecho 'Sorry no auto install for this one, please use your package manager.'
     exit 1
 fi
+if ! hash jq 2>/dev/null; then
+    if [ "${INSTALL_MISSING_DEPENDENCIES}" == "yes" ] && [ "${OSTYPE}" == "linux-gnu" ]; then
+        curl -L -O https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
+        chmod +x jq-linux64
+        mv jq-linux64 /bin/jq
+    else
+        echo '!!!jq was not found!!!'
+        echo "!!!download and install with:"
+        echo "Linux users (Run script with option -y to install automatically):"
+        echo "curl -L -O https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64"
+        echo "chmod +x jq-linux64"
+        echo "mv jq-linux64 /bin/jq"
+        exit 1
+    fi
+fi
 #Install kubectl if we're applying the cluster yaml and if we have passed -y to automatically install dependencies
 if ! hash kubectl 2>/dev/null; then
     if [ "${INSTALL_MISSING_DEPENDENCIES}" == "yes" ] && [ "${OSTYPE}" == "linux-gnu" ]; then
