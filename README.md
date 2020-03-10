@@ -5,5 +5,5 @@ This script will set you up with kubectl and retrieve your local kube config for
 Usage:
 ```bash
 curl -LO https://github.com/patrick0057/kubecert/raw/master/kubecert.sh
-bash ./kubecert.sh -y
+bash ./kubecert.sh [-y]
 ```
