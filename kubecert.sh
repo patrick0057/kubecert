@@ -102,26 +102,43 @@ if ! hash wget 2>/dev/null && [[ "${DOWNLOADCMD}" == "wget" ]]; then
     grecho 'Sorry no auto install for this one, please use your package manager.'
     exit 1
 fi
+if ! hash jq 2>/dev/null; then
+    if [ "${INSTALL_MISSING_DEPENDENCIES}" == "yes" ] && [ "${OSTYPE}" == "linux-gnu" ]; then
+        curl -L -O https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
+        chmod +x jq-linux64
+        mv jq-linux64 /bin/jq
+    else
+        echo '!!!jq was not found!!!'
+        echo "!!!download and install with:"
+        echo "Linux users (Run script with option -y to install automatically):"
+        echo "curl -L -O https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64"
+        echo "chmod +x jq-linux64"
+        echo "mv jq-linux64 /bin/jq"
+        exit 1
+    fi
+fi
 #Install kubectl if we're applying the cluster yaml and if we have passed -y to automatically install dependencies
 if ! hash kubectl 2>/dev/null; then
-    if [ "${INSTALL_MISSING_DEPENDENCIES}" == "yes" ] && [ "${OSTYPE}" == "linux-gnu" ]; then
-        recho "Installing kubectl..."
-        download "https://storage.googleapis.com/kubernetes-release/release/$(curlcmd -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
-        if [ "${LOCALBINARY}" != "yes" ]; then
-            install -o root -g root -m 755 kubectl /bin/kubectl
+    if [ "${INSTALL_MISSING_DEPENDENCIES}" == "yes" ]; then
+        if [ "${OSTYPE}" == "linux-gnu" ] || [ "${OSTYPE}" == "linux" ]; then
+            recho "Installing kubectl..."
+            download "https://storage.googleapis.com/kubernetes-release/release/$(curlcmd -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+            if [ "${LOCALBINARY}" != "yes" ]; then
+                install -o root -g root -m 755 kubectl /bin/kubectl
+            else
+                install -o root -g root -m 755 kubectl ${TMPDIR}/kubectl
+                echo to use kubectl from tmp, you need to export ${TMPDIR} into your path as shown below.
+                echo "export PATH=\${PATH}:${TMPDIR}"
+            fi
         else
-            install -o root -g root -m 755 kubectl ${TMPDIR}/kubectl
-            echo to use kubectl from tmp, you need to export ${TMPDIR} into your path as shown below.
-            echo "export PATH=\${PATH}:${TMPDIR}"
+            grecho "!!!kubectl was not found!!!"
+            grecho "!!!download and install with:"
+            grecho "Linux users (Run script with option -y to install automatically):"
+            grecho "curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+            grecho "chmod +x ./kubectl"
+            grecho "mv ./kubectl /bin/kubectl"
+            exit 1
         fi
-    else
-        grecho "!!!kubectl was not found!!!"
-        grecho "!!!download and install with:"
-        grecho "Linux users (Run script with option -y to install automatically):"
-        grecho "curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
-        grecho "chmod +x ./kubectl"
-        grecho "mv ./kubectl /bin/kubectl"
-        exit 1
     fi
 fi
 
